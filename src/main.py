@@ -1,15 +1,27 @@
 from utils.parsers.kml_parser import kml_parser
 from utils.parsers.shp_parser import shp_parser
+from utils.parsers.dxf_parser import dxf_parser
 
-kml = "assets/shapes/quadra- nova venecia.kml"
-shp = "assets/shapes/quadra - nova venecia.zip"
+# File paths
+files = {
+    "KML": "assets/shapes/quadra- nova venecia.kml",
+    "SHP": "assets/shapes/quadra - nova venecia.zip",
+    "DXF": "assets/shapes/quadra - nova venecia.dxf",
+}
+
+# Parsing coordinates
+coordinates = {
+    "KML": kml_parser(files["KML"]),
+    "SHP": shp_parser(files["SHP"]),
+    "DXF": dxf_parser(files["DXF"]),
+}
 
 
-kml_coordinates = kml_parser(kml)
-shp_coordinates = shp_parser(shp)
+def print_coordinates(coordinates):
+    for format_type, coords in coordinates.items():
+        print(f"{format_type} Coordinates:")
+        print(coords)
+        print("\n" + "-" * 28 + "\n")
 
-print(kml_coordinates)
-print("\n")
-print("----------------------------")
-print("\n")
-print(shp_coordinates)
+
+print_coordinates(coordinates)
