@@ -2,8 +2,8 @@ import os
 from pdf_to_img import convert_pdf_to_image
 from img_to_text import extract_text_from_image
 
-pdf_path = "../examples/Matrícula Inteiro Teor nº 1173 - Mario Lúcio.pdf"
-output_folder = "../dist"
+pdf_path = "examples/Memo Análise - Fabio Romão.pdf"
+output_folder = "dist"
 output_text_file = os.path.join(output_folder, "text_from_img.txt")
 output_image_path = os.path.join(output_folder, "img_from_pdf.jpg")
 poppler_path = r"C:\ProgramData\chocolatey\lib\poppler\tools\Library\bin"

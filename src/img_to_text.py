@@ -13,8 +13,6 @@ def extract_text_from_image(image_path, output_file):
     custom_config = r"--oem 3 --psm 6"
     text = pytesseract.image_to_string(denoised, lang="por+eng", config=custom_config)
 
-    # Escrever o texto em um arquivo de saída
-    # Escrever o texto em um arquivo de saída
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(text)
     print(f"Texto extraído salvo em: {output_file}")
