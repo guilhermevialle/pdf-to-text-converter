@@ -8,4 +8,8 @@ shp = "assets/shapes/quadra - nova venecia.zip"
 kml_coordinates = kml_parser(kml)
 shp_coordinates = shp_parser(shp)
 
-print(kml_coordinates, "\n", shp_coordinates)
+print(kml_coordinates)
+print("\n")
+print("----------------------------")
+print("\n")
+print(shp_coordinates)
