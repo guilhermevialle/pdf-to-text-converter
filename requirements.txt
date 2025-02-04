@@ -1,0 +1,17 @@
+# Core GIS libraries
+geopandas>=0.13.2
+pyproj>=3.6.1
+fiona>=1.9.5  # Required by geopandas
+shapely>=2.0.2  # Required by geopandas
+
+# KML handling
+pykml>=0.2.0  # For KML parsing
+lxml>=4.9.3  # Required by pykml
+
+# Optional but recommended for better performance
+rtree>=1.1.0  # Spatial indexing
+pandas>=2.1.1  # Required by geopandas
+
+# Development tools (optional)
+black>=23.9.1  # Code formatting
+flake8>=6.1.0  # Code linting
