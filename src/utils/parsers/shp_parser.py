@@ -35,7 +35,7 @@ def shp_verifier(file_path: str, extract_to: str = "temp_shp") -> str:
         return None
 
 
-def shp_parser(file_path: str, source_epsg: int) -> list:
+def shp_parser(file_path: str) -> list:
     try:
         verified_path = shp_verifier(file_path, "temp_shp")
         if not verified_path:

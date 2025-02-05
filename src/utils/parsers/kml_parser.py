@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 
-def kml_parser(file_path: str, source_epsg: int):
+def kml_parser(file_path: str):
     try:
         tree = ET.parse(file_path)
         root = tree.getroot()

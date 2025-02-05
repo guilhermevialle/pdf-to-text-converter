@@ -1,7 +1,7 @@
 import ezdxf
 
 
-def dxf_parser(file_path: str, source_epsg: int = 31984):
+def dxf_parser(file_path: str):
     try:
         doc = ezdxf.readfile(file_path)
         coordinates_list = []
@@ -36,7 +36,6 @@ def dxf_parser(file_path: str, source_epsg: int = 31984):
                         (float(vertex[0]), float(vertex[1]), float(z))
                     )
 
-        # Convert numpy float64 values to regular floats and round to 3 decimal places
         coordinates_list = [
             (round(x, 3), round(y, 3), round(z, 3)) for x, y, z in coordinates_list
         ]
