@@ -2,14 +2,12 @@ from utils.parsers.kml_parser import kml_parser
 from utils.parsers.shp_parser import shp_parser
 from utils.parsers.dxf_parser import dxf_parser
 
-# File paths
 files = {
     "KML": "assets/shapes/quadra- nova venecia.kml",
-    "SHP": "assets/shapes/quadra - nova venecia.zip",
+    "SHP": "assets/shapes/quadra - nova venecial.zip",
     "DXF": "assets/shapes/quadra - nova venecia.dxf",
 }
 
-# Parsing coordinates
 coordinates = {
     "KML": kml_parser(files["KML"]),
     "SHP": shp_parser(files["SHP"]),

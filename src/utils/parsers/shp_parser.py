@@ -4,7 +4,7 @@ import os
 from pyproj import Transformer
 
 
-def shp_parser(zip_path: str, extract_to: str = "temp_shp", source_epsg: int = 32723):
+def shp_parser(zip_path: str, extract_to: str = "temp_shp", source_epsg: int = 31984):
     try:
         os.makedirs(extract_to, exist_ok=True)
         with zipfile.ZipFile(zip_path, "r") as zip_ref:

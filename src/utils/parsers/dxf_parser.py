@@ -2,7 +2,7 @@ import ezdxf
 from pyproj import Transformer
 
 
-def dxf_parser(file_path: str, source_epsg: int = 32723):
+def dxf_parser(file_path: str, source_epsg: int = 31984):
     try:
         doc = ezdxf.readfile(file_path)
         coordinates_list = []
