@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 
-def kml_parser(file_path: str):
+def kml_parser(file_path: str, source_epsg: int):
     try:
         tree = ET.parse(file_path)
         root = tree.getroot()
@@ -12,8 +12,8 @@ def kml_parser(file_path: str):
         for coord in root.findall(".//kml:coordinates", namespaces):
             coord_text = coord.text.strip()
             for point in coord_text.split():
-                lon, lat, *_ = map(float, point.split(","))
-                coordinates_list.append((lon, lat))
+                lon, lat, alt = map(float, point.split(","))
+                coordinates_list.append((lon, lat, alt))
 
         return coordinates_list
 
