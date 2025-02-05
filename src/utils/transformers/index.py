@@ -22,6 +22,7 @@ def utm_to_latlon(utm_array, source_epsg):
 
 
 # Identifica se as coordenadas estão em UTM ou lat/lon
+# coordinates: array de coordenadas em UTM ou lat/lon
 # Retorna "utm" se as coordenadas estiverem em UTM, "latlon" se estiverem em lat/lon
 def coordinates_system_identifier(coordinates):
     if not coordinates:
