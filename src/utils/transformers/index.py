@@ -19,18 +19,3 @@ def utm_to_latlon(utm_array, source_epsg):
         f"EPSG:{source_epsg}", "EPSG:4326", always_xy=True
     )
     return [transformer.transform(x, y) for x, y, *_ in utm_array]
-
-
-# Identifica se as coordenadas estão em UTM ou lat/lon
-# coordinates: array de coordenadas em UTM ou lat/lon
-# Retorna "utm" se as coordenadas estiverem em UTM, "latlon" se estiverem em lat/lon
-def coordinates_system_identifier(coordinates):
-    if not coordinates:
-        return None
-
-    x, y, _ = coordinates[0]
-
-    if abs(x) > 180 or abs(y) > 90:
-        return "utm"
-    else:
-        return "latlon"
