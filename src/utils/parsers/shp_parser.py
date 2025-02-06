@@ -43,7 +43,14 @@ def shp_verifier(file_path: str, extract_to: str = "temp_shp") -> str:
         return None
 
 
-def shp_parser(file_path: str, source_epsg: int) -> list:
+# Função para analisar e extrair coordenadas de um arquivo shapefile
+# file_path: caminho do arquivo shapefile (.shp) ou arquivo zip contendo shapefile
+# Retorna uma lista de dicionários contendo as coordenadas dos vértices
+# Cada dicionário contém:
+# - lat/lon ou x/y: coordenadas do ponto dependendo do sistema de coordenadas
+# - alt: altitude (0 se não especificada)
+# - point_id: identificador único do vértice (V1, V2, etc)
+def shp_parser(file_path: str) -> list:
     try:
         if file_path.lower().endswith(".shp"):
             verified_path = file_path
@@ -69,7 +76,6 @@ def shp_parser(file_path: str, source_epsg: int) -> list:
                         {"lat": y, "lon": x, "alt": alt, "point_id": f"V{vertex_count}"}
                     )
                 else:
-
                     coordinates_list.append(
                         {
                             "x": x,
@@ -79,50 +85,6 @@ def shp_parser(file_path: str, source_epsg: int) -> list:
                         }
                     )
                 vertex_count += 1
-
-        return coordinates_list
-
-    except Exception as e:
-        print(f"Error parsing shapefile: {e}")
-        return []
-    try:
-        if file_path.lower().endswith(".shp"):
-            verified_path = file_path
-        else:
-            verified_path = shp_verifier(file_path, "temp_shp")
-
-        if not verified_path:
-            return []
-
-        sf = shapefile.Reader(verified_path)
-        coordinates_list = []
-        vertex_count = 1
-
-        coordinates_system = sf.shapeTypeName
-
-        for shape in sf.shapes():
-            for point in shape.points:
-                x, y = point[:2]
-                z = point[2] if len(point) > 2 else 0
-
-                # Verifica se as coordenadas são lat/lon
-                if coordinates_system.lower() in ["latlon", "geographic"]:
-                    coordinates_list.append(
-                        {"lat": y, "lon": x, "alt": z, "point_id": f"V{vertex_count}"}
-                    )
-                else:
-                    coordinates_list.append(
-                        {
-                            "x": x,
-                            "y": y,
-                            "alt": z,
-                            "zone": 22,
-                            "hemisphere": "S",
-                            "point_id": f"V{vertex_count}",
-                        }
-                    )
-                vertex_count += 1
-
         return coordinates_list
 
     except Exception as e:

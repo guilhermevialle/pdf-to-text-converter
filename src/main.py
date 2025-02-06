@@ -31,7 +31,7 @@ def main():
 
     # Analisa as coordenadas
     try:
-        coordinates = parser(file_path, epsg)
+        coordinates = parser(file_path)
 
         if not coordinates:
             print("Nenhuma coordenada encontrada no arquivo.")
