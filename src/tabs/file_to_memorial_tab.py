@@ -69,7 +69,9 @@ class FileToMemorialTab:
         text_frame.pack(fill=tk.BOTH, expand=True, pady=10)
 
         # Área de texto para exibição dos resultados
-        self.result_area = tk.Text(text_frame, height=10)
+        self.result_area = tk.Text(
+            text_frame, height=10, font=("TkDefaultFont", 10, "normal")
+        )
         self.result_area.pack(fill=tk.X, expand=False)
 
         # Botão para copiar o texto
@@ -122,8 +124,7 @@ class FileToMemorialTab:
             display_coords = latlon_to_utm(self.coordinates, epsg)
 
         # Exibe as coordenadas no formato selecionado
-        self.result_area.tag_configure("bigger", font=("TkDefaultFont", 10, "normal"))
-        self.result_area.insert(tk.END, boilerplate(display_coords), "bigger")
+        self.result_area.insert(tk.END, boilerplate(display_coords))
         self.result_area.configure(padx=8, pady=8)
 
         # Habilita o botão de copiar quando houver texto para copiar

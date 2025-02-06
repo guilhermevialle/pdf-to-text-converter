@@ -2,15 +2,10 @@
 from utils.parsers.kml_parser import kml_parser
 from utils.parsers.shp_parser import shp_parser
 from utils.parsers.dxf_parser import dxf_parser
-from utils.indetifiers.index import file_identifier
 
 # Importações do Tkinter para interface gráfica
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-
-# Importações de utilitários
-from constants.reference import epsg
-from utils.boilerplate import boilerplate
 
 # Importação das abas da aplicação
 from tabs.file_to_memorial_tab import FileToMemorialTab
@@ -28,7 +23,7 @@ class App:
     def __init__(self, root):
         # Inicialização da janela principal
         self.root = root
-        self.root.title("Sistema de Coordenadas")
+        self.root.title("Conversor de documentos geoespaciais")
         self.root.geometry("400x380")
 
         # Criação do notebook (container de abas)
