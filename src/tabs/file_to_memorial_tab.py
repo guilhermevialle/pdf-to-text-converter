@@ -8,6 +8,8 @@ from constants.reference import epsg
 from utils.boilerplate import boilerplate
 from utils.indetifiers.index import file_identifier
 from utils.math.index import calculate_area
+from utils.math.index import calculate_perimeter
+
 
 # Importações dos analisadores de arquivos
 from utils.parsers.kml_parser import kml_parser
@@ -127,7 +129,12 @@ class FileToMemorialTab:
         # Exibe as coordenadas no formato selecionado
         self.result_area.insert(tk.END, boilerplate(display_coords))
         self.result_area.insert(tk.END, "\n")
+        self.result_area.insert(tk.END, "\n")
         self.result_area.insert(tk.END, f"Área: {calculate_area(display_coords)} m²")
+        self.result_area.insert(tk.END, "\n")
+        self.result_area.insert(
+            tk.END, f"Perímetro: {calculate_perimeter(display_coords)} m"
+        )
         self.result_area.configure(padx=8, pady=8)
 
         # Habilita o botão de copiar quando houver texto para copiar
