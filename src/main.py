@@ -5,9 +5,9 @@ from utils.indetifiers.index import file_identifier
 import json
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-from tkinter.scrolledtext import ScrolledText
 from utils.transformers.index import utm_to_latlon, latlon_to_utm
 from constants.reference import epsg
+from utils.boilerplate import boilerplate
 
 
 # Função para obter o analisador apropriado com base no tipo de arquivo
@@ -58,7 +58,7 @@ class App:
         ).pack(side=tk.LEFT, padx=5)
 
         # Área de texto para exibir resultados
-        self.result_area = ScrolledText(main_frame, height=20, width=80)
+        self.result_area = tk.Text(main_frame, height=20, width=80)
         self.result_area.pack(fill=tk.BOTH, expand=True, pady=10)
 
     def select_file(self):
@@ -91,7 +91,7 @@ class App:
         self.result_area.insert(
             tk.END, f"Coordenadas no formato {self.coord_type.get().upper()}:\n\n"
         )
-        self.result_area.insert(tk.END, json.dumps(display_coords, indent=2))
+        self.result_area.insert(tk.END, boilerplate(display_coords))
 
     def process_file(self, file_path):
         # Limpa a área de resultado
