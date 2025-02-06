@@ -2,6 +2,7 @@ from utils.parsers.kml_parser import kml_parser
 from utils.parsers.shp_parser import shp_parser
 from utils.parsers.dxf_parser import dxf_parser
 from utils.indetifiers.index import file_identifier
+import json
 
 
 def get_parser(file_type):
@@ -15,7 +16,6 @@ def main():
 
     file_path = input().strip()
 
-    # Identifica o tipo de arquivo
     file_type = file_identifier(file_path)
 
     if not file_type:
@@ -40,7 +40,7 @@ def main():
             return
 
         print(f"\nCoordenadas encontradas no formato {file_type.upper()}:")
-        print(coordinates)
+        print(json.dumps(coordinates, indent=2))
 
     except Exception as e:
         print(f"Erro ao analisar o arquivo: {e}")
