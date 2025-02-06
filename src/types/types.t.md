@@ -9,7 +9,7 @@ O sistema suporta dois tipos principais de coordenadas: **UTM** e **Latitude/Lon
 
 A estrutura de uma coordenada no formato UTM é definida como um objeto com os seguintes campos:
 
-```json
+```python
 {
   "x": float,           // Coordenada E/X em metros (ex: 458123.45)
   "y": float,           // Coordenada N/Y em metros (ex: 7198234.56)
@@ -30,7 +30,7 @@ A estrutura de uma coordenada no formato UTM é definida como um objeto com os s
 
 A estrutura de uma coordenada no formato Latitude/Longitude é definida como um objeto com os seguintes campos:
 
-```json
+```python
 {
   "lat": float,         // Latitude em graus decimais (ex: -23.550520)
   "lon": float,         // Longitude em graus decimais (ex: -46.633308)
