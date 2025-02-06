@@ -6,6 +6,8 @@ import json
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from tkinter.scrolledtext import ScrolledText
+from utils.transformers.index import utm_to_latlon, latlon_to_utm
+from constants.reference import epsg
 
 
 # Função para obter o analisador apropriado com base no tipo de arquivo
@@ -19,6 +21,8 @@ class App:
         self.root = root
         self.root.title("Analisador de Coordenadas")
         self.root.geometry("420x340")
+        self.coordinates = None
+        self.coord_type = tk.StringVar(value="latlon")
 
         # Frame principal
         main_frame = ttk.Frame(root, padding="10")
@@ -31,6 +35,27 @@ class App:
             command=self.select_file,
         )
         self.select_button.pack(pady=10)
+
+        # Frame para os radio buttons
+        radio_frame = ttk.Frame(main_frame)
+        radio_frame.pack(pady=5)
+
+        # Radio buttons para escolher o formato de exibição
+        ttk.Radiobutton(
+            radio_frame,
+            text="Lat/Lon",
+            variable=self.coord_type,
+            value="latlon",
+            command=self.update_display,
+        ).pack(side=tk.LEFT, padx=5)
+
+        ttk.Radiobutton(
+            radio_frame,
+            text="UTM",
+            variable=self.coord_type,
+            value="utm",
+            command=self.update_display,
+        ).pack(side=tk.LEFT, padx=5)
 
         # Área de texto para exibir resultados
         self.result_area = ScrolledText(main_frame, height=20, width=80)
@@ -51,6 +76,22 @@ class App:
             return
 
         self.process_file(file_path)
+
+    def update_display(self):
+        if not self.coordinates:
+            return
+
+        self.result_area.delete(1.0, tk.END)
+
+        if self.coord_type.get() == "latlon":
+            display_coords = utm_to_latlon(self.coordinates, epsg)
+        else:
+            display_coords = latlon_to_utm(self.coordinates, epsg)
+
+        self.result_area.insert(
+            tk.END, f"Coordenadas no formato {self.coord_type.get().upper()}:\n\n"
+        )
+        self.result_area.insert(tk.END, json.dumps(display_coords, indent=2))
 
     def process_file(self, file_path):
         # Limpa a área de resultado
@@ -80,20 +121,17 @@ class App:
         # Tenta analisar as coordenadas do arquivo
         try:
             # Executa o parser e obtém as coordenadas
-            coordinates = parser(file_path)
+            self.coordinates = parser(file_path)
 
             # Verifica se foram encontradas coordenadas
-            if not coordinates:
+            if not self.coordinates:
                 messagebox.showinfo(
                     "Informação", "Nenhuma coordenada encontrada no arquivo."
                 )
                 return
 
-            # Exibe as coordenadas encontradas
-            self.result_area.insert(
-                tk.END, f"Coordenadas encontradas no formato {file_type.upper()}:\n\n"
-            )
-            self.result_area.insert(tk.END, json.dumps(coordinates, indent=2))
+            # Atualiza a exibição com base no formato selecionado
+            self.update_display()
 
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao analisar o arquivo: {e}")
