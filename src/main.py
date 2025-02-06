@@ -2,7 +2,6 @@ from utils.parsers.kml_parser import kml_parser
 from utils.parsers.shp_parser import shp_parser
 from utils.parsers.dxf_parser import dxf_parser
 from utils.indetifiers.index import file_identifier
-import json
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from utils.transformers.index import utm_to_latlon, latlon_to_utm
@@ -19,13 +18,25 @@ def get_parser(file_type):
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title("Analisador de Coordenadas")
-        self.root.geometry("420x340")
+        self.root.title("Sistema de Coordenadas")
+        self.root.geometry("540x400")
         self.coordinates = None
         self.coord_type = tk.StringVar(value="latlon")
 
-        # Frame principal
-        main_frame = ttk.Frame(root, padding="10")
+        # Criar notebook para abas
+        self.notebook = ttk.Notebook(root)
+        self.notebook.pack(fill=tk.BOTH, expand=True)
+
+        # Aba Memorial
+        self.memorial_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.memorial_tab, text="Gerar Memorial")
+
+        # Aba Exemplo
+        self.example_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.example_tab, text="Exemplo")
+
+        # Configurar aba Memorial
+        main_frame = ttk.Frame(self.memorial_tab, padding="10")
         main_frame.pack(fill=tk.BOTH, expand=True)
 
         # Botão para selecionar arquivo
@@ -60,6 +71,20 @@ class App:
         # Área de texto para exibir resultados
         self.result_area = tk.Text(main_frame, height=20, width=80)
         self.result_area.pack(fill=tk.BOTH, expand=True, pady=10)
+
+        # Configurar aba Exemplo
+        example_frame = ttk.Frame(self.example_tab, padding="10")
+        example_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Botão exemplo
+        self.example_button = ttk.Button(
+            example_frame,
+            text="Botão de Exemplo",
+            command=lambda: messagebox.showinfo(
+                "Exemplo", "Este é um botão de exemplo!"
+            ),
+        )
+        self.example_button.pack(pady=10)
 
     def select_file(self):
         file_path = filedialog.askopenfilename(
