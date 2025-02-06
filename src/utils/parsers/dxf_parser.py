@@ -1,15 +1,22 @@
 import ezdxf
 
 
+# Função para analisar e extrair coordenadas de um arquivo DXF
+# file_path: caminho do arquivo DXF
+# Retorna uma lista de dicionários contendo as coordenadas dos vértices
+# Cada dicionário contém:
+# - lat/lon ou x/y: coordenadas do ponto dependendo do sistema de coordenadas
+# - alt: altitude do ponto
+# - point_id: identificador único do vértice (V1, V2, etc)
 def dxf_parser(file_path: str):
     try:
         doc = ezdxf.readfile(file_path)
         coordinates_list = []
         vertex_count = 1
 
-        # Get coordinate system from DXF header
+        # Obtém o sistema de coordenadas do cabeçalho DXF
         coordinates_system = doc.header.get("$INSUNITS", None)
-        is_latlon = coordinates_system in [1, 2]  # 1=Scientific, 2=Decimal degrees
+        is_latlon = coordinates_system in [1, 2]  # 1=Científico, 2=Graus decimais
 
         for entity in doc.modelspace().query("LINE CIRCLE LWPOLYLINE POLYLINE"):
             if entity.dxftype() == "LINE":
