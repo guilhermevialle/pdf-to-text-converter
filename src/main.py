@@ -25,6 +25,8 @@ class App:
         self.root = root
         self.root.title("Conversor de documentos geoespaciais")
         self.root.geometry("400x380")
+        self.root.minsize(400, 380)
+        self.root.maxsize(800, 520)
 
         # Criação do notebook (container de abas)
         self.notebook = ttk.Notebook(root)
@@ -32,7 +34,6 @@ class App:
 
         # Inicialização da aba de memorial descritivo
         self.memorial_tab = FileToMemorialTab(self.notebook)
-
         # Inicialização da aba de exemplo
         self.example_tab = MemorialToFileTab(self.notebook)
 

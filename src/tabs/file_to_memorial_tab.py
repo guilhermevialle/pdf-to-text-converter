@@ -7,6 +7,7 @@ from utils.transformers.index import utm_to_latlon, latlon_to_utm
 from constants.reference import epsg
 from utils.boilerplate import boilerplate
 from utils.indetifiers.index import file_identifier
+from utils.math.index import calculate_area
 
 # Importações dos analisadores de arquivos
 from utils.parsers.kml_parser import kml_parser
@@ -125,6 +126,8 @@ class FileToMemorialTab:
 
         # Exibe as coordenadas no formato selecionado
         self.result_area.insert(tk.END, boilerplate(display_coords))
+        self.result_area.insert(tk.END, "\n")
+        self.result_area.insert(tk.END, f"Área: {calculate_area(display_coords)} m²")
         self.result_area.configure(padx=8, pady=8)
 
         # Habilita o botão de copiar quando houver texto para copiar
@@ -164,8 +167,9 @@ class FileToMemorialTab:
 
             # Verifica se foram encontradas coordenadas no arquivo
             if not self.coordinates:
-                messagebox.showinfo(
-                    "Informação", "Nenhuma coordenada encontrada no arquivo."
+                messagebox.showerror(
+                    "Erro",
+                    "Falha ao processar o arquivo. Nenhuma coordenada encontrada.",
                 )
                 return
 
