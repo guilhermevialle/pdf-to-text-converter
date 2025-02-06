@@ -5,12 +5,16 @@ def coordinates_system_identifier(coordinates):
     if not coordinates:
         return None
 
-    x, y, _ = coordinates[0]
+    first_coord = coordinates[0]
 
-    if abs(x) > 180 or abs(y) > 90:
+    # Check if coordinates are in UTM format
+    if "x" in first_coord and "y" in first_coord:
         return "utm"
-    else:
+    # Check if coordinates are in lat/lon format
+    elif "lat" in first_coord and "lon" in first_coord:
         return "latlon"
+    else:
+        return None
 
 
 # Identifica o tipo de arquivo com base em sua extensão
