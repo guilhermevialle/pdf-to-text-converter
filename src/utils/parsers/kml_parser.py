@@ -6,7 +6,6 @@ def kml_parser(file_path: str):
         tree = ET.parse(file_path)
         root = tree.getroot()
         namespaces = {"kml": "http://www.opengis.net/kml/2.2"}
-
         coordinates_list = []
         vertex_count = 1
 
@@ -18,7 +17,6 @@ def kml_parser(file_path: str):
                     {"lat": lat, "lon": lon, "alt": alt, "point_id": f"V{vertex_count}"}
                 )
                 vertex_count += 1
-
         return coordinates_list
 
     except Exception as e:

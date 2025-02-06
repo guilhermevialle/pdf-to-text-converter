@@ -43,10 +43,7 @@ def shp_verifier(file_path: str, extract_to: str = "temp_shp") -> str:
         return None
 
 
-# Função principal para analisar arquivos shapefile
-# file_path: caminho do arquivo (.shp ou .zip)
-# Retorna uma lista de tuplas com coordenadas (x, y, z)
-def shp_parser(file_path: str) -> list:
+def shp_parser(file_path: str, source_epsg: int) -> list:
     try:
         if file_path.lower().endswith(".shp"):
             verified_path = file_path
@@ -58,12 +55,73 @@ def shp_parser(file_path: str) -> list:
 
         sf = shapefile.Reader(verified_path)
         coordinates_list = []
+        vertex_count = 1
+
+        coordinates_system = sf.shapeTypeName
+
+        for shape in sf.shapes():
+            for point in shape.points:
+                x, y = point[:2]
+                alt = point[2] if len(point) > 2 else 0
+
+                if coordinates_system.lower() in ["latlon", "geographic"]:
+                    coordinates_list.append(
+                        {"lat": y, "lon": x, "alt": alt, "point_id": f"V{vertex_count}"}
+                    )
+                else:
+
+                    coordinates_list.append(
+                        {
+                            "x": x,
+                            "y": y,
+                            "alt": alt,
+                            "point_id": f"V{vertex_count}",
+                        }
+                    )
+                vertex_count += 1
+
+        return coordinates_list
+
+    except Exception as e:
+        print(f"Error parsing shapefile: {e}")
+        return []
+    try:
+        if file_path.lower().endswith(".shp"):
+            verified_path = file_path
+        else:
+            verified_path = shp_verifier(file_path, "temp_shp")
+
+        if not verified_path:
+            return []
+
+        sf = shapefile.Reader(verified_path)
+        coordinates_list = []
+        vertex_count = 1
+
+        coordinates_system = sf.shapeTypeName
 
         for shape in sf.shapes():
             for point in shape.points:
                 x, y = point[:2]
                 z = point[2] if len(point) > 2 else 0
-                coordinates_list.append((x, y, z))
+
+                # Verifica se as coordenadas são lat/lon
+                if coordinates_system.lower() in ["latlon", "geographic"]:
+                    coordinates_list.append(
+                        {"lat": y, "lon": x, "alt": z, "point_id": f"V{vertex_count}"}
+                    )
+                else:
+                    coordinates_list.append(
+                        {
+                            "x": x,
+                            "y": y,
+                            "alt": z,
+                            "zone": 22,
+                            "hemisphere": "S",
+                            "point_id": f"V{vertex_count}",
+                        }
+                    )
+                vertex_count += 1
 
         return coordinates_list
 

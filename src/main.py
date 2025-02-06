@@ -3,6 +3,7 @@ from utils.parsers.shp_parser import shp_parser
 from utils.parsers.dxf_parser import dxf_parser
 from utils.indetifiers.index import file_identifier
 import json
+from constants.reference import epsg
 
 
 def get_parser(file_type):
@@ -11,16 +12,13 @@ def get_parser(file_type):
 
 
 def main():
-    print("Bem-vindo ao Analisador de Coordenadas!")
     print("Por favor, insira o caminho do seu arquivo (KML, SHP/ZIP ou DXF):")
-
     file_path = input().strip()
-
     file_type = file_identifier(file_path)
 
     if not file_type:
         print(
-            "Erro: Formato de arquivo não suportado. Por favor, use arquivos KML, SHP/ZIP ou DXF."
+            "Erro: Formato de arquivo não suportado. Por favor, use arquivos KML, SHP/ZIP ou DXF"
         )
         return
 
@@ -33,7 +31,7 @@ def main():
 
     # Analisa as coordenadas
     try:
-        coordinates = parser(file_path)
+        coordinates = parser(file_path, epsg)
 
         if not coordinates:
             print("Nenhuma coordenada encontrada no arquivo.")
