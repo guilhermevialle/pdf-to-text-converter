@@ -1,6 +1,7 @@
 import zipfile
 import shapefile
 import os
+import shutil
 
 
 # Função para descompactar arquivos .zip contendo arquivos .shp
@@ -9,6 +10,10 @@ import os
 # Retorna o caminho do arquivo .shp extraído ou None em caso de erro
 def unzip_shp(zip_path: str, extract_to: str = "temp_shp") -> str:
     try:
+        # Remove temp directory if it exists
+        if os.path.exists(extract_to):
+            shutil.rmtree(extract_to)
+
         os.makedirs(extract_to, exist_ok=True)
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(extract_to)
@@ -17,10 +22,15 @@ def unzip_shp(zip_path: str, extract_to: str = "temp_shp") -> str:
             if file.lower().endswith(".shp"):
                 return os.path.join(extract_to, file)
 
+        # Clean up if no .shp file found
+        shutil.rmtree(extract_to)
         return None
 
     except Exception as e:
         print(f"Error unzipping file: {e}")
+        # Clean up on error
+        if os.path.exists(extract_to):
+            shutil.rmtree(extract_to)
         return None
 
 
@@ -51,11 +61,12 @@ def shp_verifier(file_path: str, extract_to: str = "temp_shp") -> str:
 # - alt: altitude (0 se não especificada)
 # - point_id: identificador único do vértice (V1, V2, etc)
 def shp_parser(file_path: str) -> list:
+    temp_dir = "temp_shp"
     try:
         if file_path.lower().endswith(".shp"):
             verified_path = file_path
         else:
-            verified_path = shp_verifier(file_path, "temp_shp")
+            verified_path = shp_verifier(file_path, temp_dir)
 
         if not verified_path:
             return []
@@ -85,8 +96,19 @@ def shp_parser(file_path: str) -> list:
                         }
                     )
                 vertex_count += 1
+
+        # Close shapefile reader before cleanup
+        sf = None
+
+        # Clean up temp directory if it exists and was used
+        if os.path.exists(temp_dir) and file_path.lower().endswith(".zip"):
+            shutil.rmtree(temp_dir)
+
         return coordinates_list
 
     except Exception as e:
         print(f"Error parsing shapefile: {e}")
+        # Clean up on error
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
         return []
