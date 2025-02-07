@@ -103,44 +103,44 @@ def decimal_para_gms(angulo):
 #     pontos (list): Lista de dicionários contendo as coordenadas dos pontos
 # Returns:
 #     list: Lista de dicionários com os azimutes calculados entre os pontos
-def calcular_azimutes(pontos):
+def get_azimutes(coordinates):
     azimutes = []
 
-    for i in range(len(pontos) - 1):
-        p1, p2 = pontos[i], pontos[i + 1]
+    for i in range(len(coordinates) - 1):
+        p1, p2 = coordinates[i], coordinates[i + 1]
         delta_x = p2["x"] - p1["x"]
         delta_y = p2["y"] - p1["y"]
 
         azimute_rad = math.atan2(delta_y, delta_x)
-        azimute_graus = math.degrees(azimute_rad)
+        azimute_degrees = math.degrees(azimute_rad)
 
-        if azimute_graus < 0:
-            azimute_graus += 360
+        if azimute_degrees < 0:
+            azimute_degrees += 360
 
         azimutes.append(
             {
                 "de": p1["point_id"],
                 "para": p2["point_id"],
-                "azimute": decimal_para_gms(azimute_graus),
+                "azimute": decimal_para_gms(azimute_degrees),
             }
         )
 
     return azimutes
 
 
-def calcular_distancias(pontos):
-    distancias = []
+def get_distances(coordinates):
+    distances = []
 
-    for i in range(len(pontos) - 1):
-        p1, p2 = pontos[i], pontos[i + 1]
-        distancia = math.sqrt((p2["x"] - p1["x"]) ** 2 + (p2["y"] - p1["y"]) ** 2)
+    for i in range(len(coordinates) - 1):
+        p1, p2 = coordinates[i], coordinates[i + 1]
+        distance = math.sqrt((p2["x"] - p1["x"]) ** 2 + (p2["y"] - p1["y"]) ** 2)
 
-        distancias.append(
+        distances.append(
             {
                 "de": p1["point_id"],
                 "para": p2["point_id"],
-                "distancia_m": round(distancia, 3),
+                "distancia_m": round(distance, 3),
             }
         )
 
-    return distancias
+    return distances

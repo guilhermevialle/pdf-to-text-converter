@@ -1,11 +1,5 @@
 from utils.math.index import calculate_area, calculate_perimeter
-
-
-# Função que gera um texto descritivo a partir de uma lista de coordenadas
-# Args:
-#     coordinates (list): Lista de dicionários contendo coordenadas no formato UTM ou LatLon
-# Returns:
-#     str: Texto descritivo formatado com as coordenadas
+from utils.indetifiers.index import coordinates_system_identifier
 
 
 def sigef_memorial_boilerplate(coordinates):
@@ -34,25 +28,41 @@ Azimutes: Azimutes Geodésicos
 
                           IMÓVEL DESCRIÇÃO
 """
-
-    text = "Inicia-se a descrição deste perímetro no vértice "
+    # Chama a função boilerplate e concatena com utm_header
+    description_text = boilerplate(coordinates)
+    full_text = utm_header + "\n" + description_text
+    return full_text
 
 
 def boilerplate(coordinates):
-    for i, coord in enumerate(coordinates, 1):
-        if i == len(coordinates):
-            text += f"terminando em V{i} "
-        else:
-            text += f"V{i} "
+    text = "Inicia-se a descrição deste perímetro no vértice "
 
-        if "lat" in coord and "lon" in coord:
-            text += f"{coord['lat']:.6f} {coord['lon']:.6f} altura 0"
+    # Identify the coordinate system
+    coord_system = coordinates_system_identifier(coordinates)
+
+    for i, coord in enumerate(coordinates):
+        point_id = coord.get(
+            "point_id", f"V{i+1}"
+        )  # Default to "V{i+1}" if point_id is missing
+
+        if i == len(coordinates) - 1:
+            text += f"terminando em {point_id} "
         else:
+            text += f"{point_id} "
+
+        # Extract altitude, or use a default if not provided
+        altitude = coord.get("alt", "altura não especificada")
+
+        if coord_system == "latlon":
+            text += f"{coord['lat']:.6f} {coord['lon']:.6f}"
+        elif coord_system == "utm":
             easting = coord["x"]
             northing = coord["y"]
-            text += f"{easting:.2f}m E {northing:.2f}m N altura 0"
+            text += f"{easting:.2f}m E {northing:.2f}m N"
+        else:
+            text += "Coordenadas inválidas"
 
-        if i < len(coordinates):
+        if i < len(coordinates) - 1:
             text += ", "
 
     return text
