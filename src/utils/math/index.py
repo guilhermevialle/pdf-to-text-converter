@@ -1,4 +1,5 @@
 from math import radians, sin, cos, sqrt, atan2
+import math
 
 
 # Calcula a área de um polígono a partir de uma lista de coordenadas
@@ -83,3 +84,63 @@ def calculate_perimeter(coordinates: list) -> float:
             perimeter += R * c
 
     return round(perimeter, 2)
+
+
+# Converte um ângulo decimal para graus, minutos e segundos
+# Args:
+#     angulo (float): Ângulo em graus decimais
+# Returns:
+#     str: String formatada com graus, minutos e segundos
+def decimal_para_gms(angulo):
+    graus = int(angulo)
+    minutos = int((angulo - graus) * 60)
+    segundos = ((angulo - graus) * 60 - minutos) * 60
+    return f"{graus}° {minutos}’ {segundos:.2f}”"
+
+
+# Calcula os azimutes entre pontos consecutivos
+# Args:
+#     pontos (list): Lista de dicionários contendo as coordenadas dos pontos
+# Returns:
+#     list: Lista de dicionários com os azimutes calculados entre os pontos
+def calcular_azimutes(pontos):
+    azimutes = []
+
+    for i in range(len(pontos) - 1):
+        p1, p2 = pontos[i], pontos[i + 1]
+        delta_x = p2["x"] - p1["x"]
+        delta_y = p2["y"] - p1["y"]
+
+        azimute_rad = math.atan2(delta_y, delta_x)
+        azimute_graus = math.degrees(azimute_rad)
+
+        if azimute_graus < 0:
+            azimute_graus += 360
+
+        azimutes.append(
+            {
+                "de": p1["point_id"],
+                "para": p2["point_id"],
+                "azimute": decimal_para_gms(azimute_graus),
+            }
+        )
+
+    return azimutes
+
+
+def calcular_distancias(pontos):
+    distancias = []
+
+    for i in range(len(pontos) - 1):
+        p1, p2 = pontos[i], pontos[i + 1]
+        distancia = math.sqrt((p2["x"] - p1["x"]) ** 2 + (p2["y"] - p1["y"]) ** 2)
+
+        distancias.append(
+            {
+                "de": p1["point_id"],
+                "para": p2["point_id"],
+                "distancia_m": round(distancia, 3),
+            }
+        )
+
+    return distancias

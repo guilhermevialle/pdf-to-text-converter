@@ -1,6 +1,8 @@
 # Importações do Tkinter para interface gráfica
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+import json
+from utils.math.index import calcular_azimutes, calcular_distancias
 
 # Importações de utilitários para transformação de coordenadas
 from utils.transformers.index import utm_to_latlon, latlon_to_utm
@@ -127,9 +129,11 @@ class FileToMemorialTab:
             display_coords = latlon_to_utm(self.coordinates, epsg)
 
         # Exibe as coordenadas no formato selecionado
+        print(calcular_distancias(display_coords))
         self.result_area.insert(tk.END, boilerplate(display_coords))
         self.result_area.insert(tk.END, "\n")
         self.result_area.insert(tk.END, "\n")
+
         self.result_area.insert(tk.END, f"Área: {calculate_area(display_coords)} m²")
         self.result_area.insert(tk.END, "\n")
         self.result_area.insert(
