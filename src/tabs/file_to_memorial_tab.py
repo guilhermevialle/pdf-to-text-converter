@@ -72,7 +72,9 @@ class FileToMemorialTab:
             command=self.copy_text,
             state=tk.DISABLED,
         )
-        self.copy_button.pack(pady=5)
+        self.copy_button.pack(
+            expand=False,
+        )
 
     def copy_text(self):
         # Copia o texto da área de resultado para a área de transferência
@@ -115,7 +117,9 @@ class FileToMemorialTab:
             display_coords = latlon_to_utm(self.coordinates, epsg)
 
         # Exibe as coordenadas no formato selecionado
-        self.result_area.insert(tk.END, sigef_memorial_boilerplate(display_coords))
+        self.result_area.insert(
+            tk.END, sigef_memorial_boilerplate(display_coords, "AHF2")
+        )
         self.result_area.insert(tk.END, "\n")
         self.result_area.configure(padx=8, pady=8)
 

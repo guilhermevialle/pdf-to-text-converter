@@ -4,18 +4,19 @@ import math
 
 # Calcula a área de um polígono a partir de uma lista de coordenadas
 # coordinates: lista de dicionários contendo coordenadas (UTM ou LatLon)
-# Retorna: área em metros quadrados (float)
-def calculate_area(coordinates: list) -> float:
+# unit: unidade de área ('m2', 'km2', 'ha') - padrão é 'm2'
+# Retorna: área calculada na unidade especificada (float)
+def calculate_area(coordinates: list, unit: str = "m2") -> float:
     if not coordinates or len(coordinates) < 3:
         return 0.0
 
-    # Verifica se são coordenadas UTM ou LatLon
+    # Check if coordinates are UTM or LatLon
     is_utm = "x" in coordinates[0]
 
     area = 0.0
 
     if is_utm:
-        # Cálculo para coordenadas UTM
+        # Calculation for UTM coordinates
         for i in range(len(coordinates)):
             j = (i + 1) % len(coordinates)
             area += coordinates[i]["x"] * coordinates[j]["y"]
@@ -24,9 +25,8 @@ def calculate_area(coordinates: list) -> float:
         area = abs(area) / 2.0
 
     else:
-        # Cálculo para coordenadas LatLon usando a fórmula de Gauss modificada
-        # para coordenadas esféricas
-        R = 6371000  # Raio médio da Terra em metros
+        # Calculation for LatLon coordinates using modified Gauss formula
+        R = 6371000  # Average Earth radius in meters
 
         for i in range(len(coordinates)):
             j = (i + 1) % len(coordinates)
@@ -40,23 +40,30 @@ def calculate_area(coordinates: list) -> float:
 
         area = abs(area * R * R / 2.0)
 
+    # Unit conversion
+    if unit.lower() == "km2":
+        area /= 1_000_000  # m² to km²
+    elif unit.lower() == "ha":
+        area /= 10_000  # m² to hectares
+
     return round(area, 2)
 
 
 # Calcula o perímetro de um polígono a partir de uma lista de coordenadas
 # coordinates: lista de dicionários contendo coordenadas (UTM ou LatLon)
-# Retorna: perímetro em metros (float)
-def calculate_perimeter(coordinates: list) -> float:
+# unit: unidade de distância ('m', 'km') - padrão é 'm'
+# Retorna: perímetro calculado na unidade especificada (float)
+def calculate_perimeter(coordinates: list, unit: str = "m") -> float:
     if not coordinates or len(coordinates) < 2:
         return 0.0
 
-    # Verifica se são coordenadas UTM ou LatLon
+    # Check if coordinates are UTM or LatLon
     is_utm = "x" in coordinates[0]
 
     perimeter = 0.0
 
     if is_utm:
-        # Cálculo para coordenadas UTM usando distância euclidiana
+        # Calculation for UTM coordinates using Euclidean distance
         for i in range(len(coordinates)):
             j = (i + 1) % len(coordinates)
             dx = coordinates[j]["x"] - coordinates[i]["x"]
@@ -64,8 +71,8 @@ def calculate_perimeter(coordinates: list) -> float:
             perimeter += sqrt(dx * dx + dy * dy)
 
     else:
-        # Cálculo para coordenadas LatLon usando fórmula de Haversine
-        R = 6371000  # Raio médio da Terra em metros
+        # Calculation for LatLon coordinates using Haversine formula
+        R = 6371000  # Average Earth radius in meters
 
         for i in range(len(coordinates)):
             j = (i + 1) % len(coordinates)
@@ -83,6 +90,10 @@ def calculate_perimeter(coordinates: list) -> float:
 
             perimeter += R * c
 
+    # Convert to kilometers if requested
+    if unit.lower() == "km":
+        perimeter /= 1000
+
     return round(perimeter, 2)
 
 
@@ -91,7 +102,7 @@ def calculate_perimeter(coordinates: list) -> float:
 #     angulo (float): Ângulo em graus decimais
 # Returns:
 #     str: String formatada com graus, minutos e segundos
-def decimal_para_gms(angulo):
+def dec_to_gms(angulo):
     graus = int(angulo)
     minutos = int((angulo - graus) * 60)
     segundos = ((angulo - graus) * 60 - minutos) * 60
@@ -121,7 +132,7 @@ def get_azimutes(coordinates):
             {
                 "de": p1["point_id"],
                 "para": p2["point_id"],
-                "azimute": decimal_para_gms(azimute_degrees),
+                "azimute": dec_to_gms(azimute_degrees),
             }
         )
 
