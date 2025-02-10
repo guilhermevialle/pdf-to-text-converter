@@ -1,6 +1,12 @@
 from utils.math.index import calculate_area, calculate_perimeter
 from utils.indetifiers.index import coordinates_system_identifier
 import re
+from datetime import datetime
+
+
+def text_info():
+    date = datetime.now().strftime("%d/%m/%Y")
+    return date
 
 
 def sigef_memorial_boilerplate(coordinates, vertex_id: str = None):
@@ -27,11 +33,43 @@ Perímetro: {perimeter}m
 Sistema Geodésico de Referência: SIRGAS2000
 Azimutes: Azimutes Geodésicos
 
-                                    IMÓVEL DESCRIÇÃO
+                                         IMÓVEL DESCRIÇÃO
 """
+
+    text_ends = f"""
+Todas as coordenadas aqui descritas estão georreferenciadas ao Sistema Geodésico Brasileiro e encontram-se representadas no Sistema UTM, referenciadas ao Meridiano Central nº 45 WGr, tendo como Datum o SIRGAS2000. Todos os azimutes e distâncias, área e perímetro foram calculados no plano de projeção UTM.
+"""
+
+    date_text = f"""
+                                         Cidade, {text_info()}
+"""
+
+    footer_text = f"""
+_______________________________________
+Proprietário:
+CNPJ nº ou CPF nº:
+
+_______________________________________
+Responsável Técnico:
+Formação:
+Código Credenciamento ASR -
+CREA:
+"""
+
     # Chama a função boilerplate e concatena com utm_header
+
     description_text = boilerplate(coordinates, vertex_id)
-    full_text = utm_header + "\n" + description_text
+    full_text = (
+        utm_header
+        + "\n"
+        + description_text
+        + "\n"
+        + text_ends
+        + "\n"
+        + date_text
+        + "\n"
+        + footer_text
+    )
     return full_text
 
 

@@ -46,7 +46,7 @@ def calculate_area(coordinates: list, unit: str = "m2") -> float:
     elif unit.lower() == "ha":
         area /= 10_000  # m² to hectares
 
-    return round(area, 2)
+    return round(area, 4)
 
 
 # Calcula o perímetro de um polígono a partir de uma lista de coordenadas
@@ -94,7 +94,7 @@ def calculate_perimeter(coordinates: list, unit: str = "m") -> float:
     if unit.lower() == "km":
         perimeter /= 1000
 
-    return round(perimeter, 2)
+    return round(perimeter, 4)
 
 
 # Converte um ângulo decimal para graus, minutos e segundos
