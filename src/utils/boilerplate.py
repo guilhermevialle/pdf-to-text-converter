@@ -2,6 +2,8 @@ from utils.math.index import calculate_area, calculate_perimeter
 from utils.indetifiers.index import coordinates_system_identifier
 import re
 from datetime import datetime
+from utils.helpers.index import get_epsg_info
+from constants.reference import epsg
 
 
 def text_info():
@@ -75,6 +77,10 @@ CREA:
 
 def boilerplate(coordinates, vertex_id: str = None):
     text = "Inicia-se a descrição deste perímetro no vértice "
+    mc = None
+    hemisphere = None
+    meridiano, hemisferio = get_epsg_info(epsg)
+    first_vertex_text = f", georreferenciado no Sistema Geodésico Brasileiro, DATUM - SIRGAS2000, MC-{meridiano}º{hemisferio} "
 
     # Identifica o sistema de coordenadas
     coord_system = coordinates_system_identifier(coordinates)
@@ -89,6 +95,8 @@ def boilerplate(coordinates, vertex_id: str = None):
         else:
             point_id = coord.get("point_id", f"V{i+1}")  # Default fallback
 
+        if i == 0:
+            text += f"{point_id}{first_vertex_text}"
         if i == len(coordinates) - 1:
             text += f"terminando em {point_id} "
         else:
