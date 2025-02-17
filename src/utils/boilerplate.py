@@ -1,9 +1,10 @@
 from utils.math.index import calculate_area, calculate_perimeter
 from utils.indetifiers.index import coordinates_system_identifier
-import re
 from datetime import datetime
 from utils.helpers.index import get_epsg_info
 from constants.reference import epsg
+import re
+from utils.math.index import get_azimutes, get_distances
 
 
 def text_info():
@@ -11,9 +12,15 @@ def text_info():
     return date
 
 
-def sigef_memorial_boilerplate(coordinates, vertex_id: str = None):
+def sigef_memorial_boilerplate(
+    coordinates,
+    epsg: int,
+    include_height: bool,
+    vertex_id: str = None,
+):
     area = calculate_area(coordinates, "ha")
     perimeter = calculate_perimeter(coordinates, "m")
+    meridiano, hemisferio = get_epsg_info(epsg)
 
     utm_header = f"""
 Imóvel:
@@ -39,7 +46,7 @@ Azimutes: Azimutes Geodésicos
 """
 
     text_ends = f"""
-Todas as coordenadas aqui descritas estão georreferenciadas ao Sistema Geodésico Brasileiro e encontram-se representadas no Sistema UTM, referenciadas ao Meridiano Central nº 45 WGr, tendo como Datum o SIRGAS2000. Todos os azimutes e distâncias, área e perímetro foram calculados no plano de projeção UTM.
+Todas as coordenadas aqui descritas estão georreferenciadas ao Sistema Geodésico Brasileiro e encontram-se representadas no Sistema UTM, referenciadas ao Meridiano Central nº {meridiano} {hemisferio}Gr, tendo como Datum o SIRGAS2000. Todos os azimutes e distâncias, área e perímetro foram calculados no plano de projeção UTM.
 """
 
     date_text = f"""
@@ -60,7 +67,7 @@ CREA:
 
     # Chama a função boilerplate e concatena com utm_header
 
-    description_text = boilerplate(coordinates, vertex_id)
+    description_text = boilerplate(coordinates, epsg, include_height, vertex_id)
     full_text = (
         utm_header
         + "\n"
@@ -75,46 +82,48 @@ CREA:
     return full_text
 
 
-def boilerplate(coordinates, vertex_id: str = None):
+def boilerplate(
+    coordinates,
+    epsg: int,
+    include_height: bool,
+    vertex_id: str = None,
+):
     text = "Inicia-se a descrição deste perímetro no vértice "
-    mc = None
-    hemisphere = None
     meridiano, hemisferio = get_epsg_info(epsg)
     first_vertex_text = f", georreferenciado no Sistema Geodésico Brasileiro, DATUM - SIRGAS2000, MC-{meridiano}º{hemisferio} "
+
+    # Obter azimutes e distâncias
+    azimutes = get_azimutes(coordinates)
+    distances = get_distances(coordinates)
 
     # Identifica o sistema de coordenadas
     coord_system = coordinates_system_identifier(coordinates)
 
     for i, coord in enumerate(coordinates):
         if vertex_id:
-            # Check if last character is a number
             if re.search(r"\d$", vertex_id):
-                point_id = f"{vertex_id}-{i+1}"  # Add "-" before the counter
+                point_id = f"{vertex_id}-{i+1}"
             else:
-                point_id = f"{vertex_id}{i+1}"  # Append counter directly
+                point_id = f"{vertex_id}{i+1}"
         else:
-            point_id = coord.get("point_id", f"V{i+1}")  # Default fallback
+            point_id = coord.get("point_id", f"V{i+1}")
 
+        # Construindo o texto para as coordenadas
+        coord_text = ""
+        if coord_system == "utm":
+            coord_text = f"de coordenadas N {coord['y']:.2f}m e E {coord['x']:.2f}m"
+            if include_height and "alt" in coord:
+                coord_text += f" de altitude {coord['alt']:.2f}m"
+
+        # Primeiro vértice
         if i == 0:
-            text += f"{point_id}{first_vertex_text}"
-        if i == len(coordinates) - 1:
-            text += f"terminando em {point_id} "
+            text += f"{point_id}{first_vertex_text}{coord_text}"
+        # Vértices intermediários e final
         else:
-            text += f"{point_id} "
+            prev_azimute = azimutes[i - 1]["azimute"]
+            prev_distance = distances[i - 1]["distancia_m"]
 
-        # Extrai altitude, ou usa um padrão se não fornecida
-        altitude = coord.get("alt", "altura não especificada")
+            text += f"; deste segue, com azimute de {prev_azimute} por uma distância de {prev_distance:.2f}m até o vértice {point_id}, {coord_text}"
 
-        if coord_system == "latlon":
-            text += f"{coord['lat']:.6f} {coord['lon']:.6f}"
-        elif coord_system == "utm":
-            easting = coord["x"]
-            northing = coord["y"]
-            text += f"{easting:.2f}m E {northing:.2f}m N"
-        else:
-            text += "Coordenadas inválidas"
-
-        if i < len(coordinates) - 1:
-            text += ", "
-
+    text += "."
     return text

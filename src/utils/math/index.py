@@ -1,5 +1,8 @@
 from math import radians, sin, cos, sqrt, atan2
 import math
+from utils.indetifiers.index import coordinates_system_identifier
+from utils.transformers.index import latlon_to_utm
+from constants.reference import epsg
 
 
 # Calcula a área de um polígono a partir de uma lista de coordenadas
@@ -114,9 +117,14 @@ def dec_to_gms(angulo):
 #     pontos (list): Lista de dicionários contendo as coordenadas dos pontos
 # Returns:
 #     list: Lista de dicionários com os azimutes calculados entre os pontos
-def get_azimutes(coordinates):
+def get_azimutes(coordinates, epsg=32723):
     azimutes = []
 
+    coord_system = coordinates_system_identifier(coordinates)
+    if coord_system == "latlon":
+        coordinates = latlon_to_utm(coordinates, epsg)
+
+    # O loop do for estava incorreto - a identação estava errada
     for i in range(len(coordinates) - 1):
         p1, p2 = coordinates[i], coordinates[i + 1]
         delta_x = p2["x"] - p1["x"]
@@ -139,8 +147,12 @@ def get_azimutes(coordinates):
     return azimutes
 
 
-def get_distances(coordinates):
+def get_distances(coordinates, epsg=32723):
     distances = []
+    coord_system = coordinates_system_identifier(coordinates)
+
+    if coord_system == "latlon":
+        coordinates = latlon_to_utm(coordinates, epsg)
 
     for i in range(len(coordinates) - 1):
         p1, p2 = coordinates[i], coordinates[i + 1]

@@ -24,7 +24,6 @@ class App:
         # Inicialização da janela principal
         self.root = root
         self.root.title("Conversor de documentos geoespaciais")
-        self.root.geometry("540x360")
         self.root.minsize(540, 360)
         self.root.maxsize(800, 600)
 
