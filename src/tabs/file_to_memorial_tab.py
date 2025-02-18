@@ -1,4 +1,3 @@
-# Importações do Tkinter para interface gráfica
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
@@ -7,7 +6,7 @@ from utils.transformers.index import utm_to_latlon, latlon_to_utm
 from constants.reference import epsg
 from utils.indetifiers.index import file_identifier
 from utils.helpers.index import get_parser
-from boilerplate_switch import boilerplate_switch
+from generate_memorial import generate_memorial
 
 
 class FileToMemorialTab:
@@ -54,6 +53,8 @@ class FileToMemorialTab:
         ).pack(side=tk.LEFT, padx=5)
 
         self.memorial_type = tk.StringVar(value="SIGEF")
+        # Configura o rastreamento de alterações para memorial_type
+        self.memorial_type.trace_add("write", self.on_value_change)
 
         # Frame para os botões de rádio de tipo de memorial
         memorial_radio_frame = ttk.Frame(main_frame)
@@ -93,8 +94,12 @@ class FileToMemorialTab:
             epsg_frame, validate="key", validatecommand=(validate_epsg, "%P")
         )
         self.epsg_entry.pack(side=tk.LEFT, padx=5)
+        # Adiciona evento para detectar mudanças no campo EPSG
+        self.epsg_entry.bind("<KeyRelease>", self.on_value_change)
 
         self.include_altitude = tk.BooleanVar(value=False)
+        # Configura o rastreamento de alterações para include_altitude
+        self.include_altitude.trace_add("write", self.on_value_change)
 
         # Frame para o checkbox de incluir altura
         height_checkbox_frame = ttk.Frame(main_frame)
@@ -119,6 +124,8 @@ class FileToMemorialTab:
         # Campo de entrada de texto para o nome do vértice
         self.vertex_entry = ttk.Entry(vertex_frame)
         self.vertex_entry.pack(side=tk.LEFT, padx=5)
+        # Adiciona evento para detectar mudanças no campo de nome do vértice
+        self.vertex_entry.bind("<KeyRelease>", self.on_value_change)
 
         # Frame para área de texto e botão
         text_frame = ttk.Frame(main_frame)
@@ -143,6 +150,15 @@ class FileToMemorialTab:
             side=tk.BOTTOM,  # or another side like tk.TOP, tk.LEFT, or tk.RIGHT
             pady=4,  # Adds some padding for visibility
         )
+
+        # Configura o rastreamento de alterações para coord_type
+        self.coord_type.trace_add("write", self.on_value_change)
+
+    def on_value_change(self, *args):
+        """Método chamado quando qualquer valor relevante é alterado."""
+        # Só atualiza o display se já houver coordenadas carregadas
+        if self.coordinates:
+            self.update_display()
 
     def copy_text(self):
         # Copia o texto da área de resultado para a área de transferência
@@ -200,40 +216,10 @@ class FileToMemorialTab:
         # Exibe as coordenadas no formato selecionado
         self.result_area.insert(
             tk.END,
-            boilerplate_switch(
+            generate_memorial(
                 self.memorial_type.get(),
                 display_coords,
                 epsg_code,
-                self.include_altitude.get(),  # Atualiza com a checkbox de altitude
-                self.vertex_entry.get(),
-            ),
-        )
-        self.result_area.insert(tk.END, "\n")
-        self.result_area.configure(padx=8, pady=8)
-
-        # Habilita o botão de copiar quando houver texto para copiar
-        self.copy_button.config(state=tk.NORMAL)
-
-        # Verifica se existem coordenadas para exibir
-        if not self.coordinates:
-            return
-
-        # Limpa a área de texto
-        self.result_area.delete(1.0, tk.END)
-
-        # Converte as coordenadas para o formato selecionado
-        if self.coord_type.get() == "latlon":
-            display_coords = utm_to_latlon(self.coordinates, epsg)
-        else:
-            display_coords = latlon_to_utm(self.coordinates, epsg)
-
-        # Exibe as coordenadas no formato selecionado
-        self.result_area.insert(
-            tk.END,
-            boilerplate_switch(
-                self.memorial_type.get(),
-                display_coords,
-                epsg,
                 self.include_altitude.get(),
                 self.vertex_entry.get(),
             ),
@@ -255,51 +241,6 @@ class FileToMemorialTab:
         if not epsg_value:
             messagebox.showerror("Erro", "EPSG é um campo obrigatório!")
             return
-
-        # Identifica o tipo do arquivo selecionado
-        file_type = file_identifier(file_path)
-
-        # Verifica se o tipo de arquivo é suportado
-        if not file_type:
-            messagebox.showerror(
-                "Erro",
-                "Formato de arquivo não suportado. Por favor, use arquivos KML, SHP/ZIP ou DXF",
-            )
-            return
-
-        # Obtém o analisador apropriado para o tipo de arquivo
-        parser = get_parser(file_type)
-
-        # Verifica se existe um analisador disponível
-        if not parser:
-            messagebox.showerror(
-                "Erro", "Não foi possível encontrar um analisador apropriado."
-            )
-            return
-
-        # Processa o arquivo e extrai as coordenadas
-        try:
-            # Executa o parser no arquivo selecionado
-            self.coordinates = parser(file_path)
-
-            # Verifica se foram encontradas coordenadas no arquivo
-            if not self.coordinates:
-                messagebox.showerror(
-                    "Erro",
-                    "Falha ao processar o arquivo. Nenhuma coordenada encontrada.",
-                )
-                return
-
-            # Atualiza a exibição com as novas coordenadas
-            self.update_display()
-
-        except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao analisar o arquivo: {e}")
-
-        # Limpa a área de resultado antes de processar novo arquivo
-        self.result_area.delete(1.0, tk.END)
-        # Desabilita o botão de copiar
-        self.copy_button.config(state=tk.DISABLED)
 
         # Identifica o tipo do arquivo selecionado
         file_type = file_identifier(file_path)
