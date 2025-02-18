@@ -24,7 +24,7 @@ class App:
         # Inicialização da janela principal
         self.root = root
         self.root.title("Conversor de documentos geoespaciais")
-        self.root.minsize(540, 360)
+        self.root.minsize(540, 480)
         self.root.maxsize(800, 600)
 
         # Criação do notebook (container de abas)

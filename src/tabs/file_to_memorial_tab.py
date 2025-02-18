@@ -94,7 +94,7 @@ class FileToMemorialTab:
         )
         self.epsg_entry.pack(side=tk.LEFT, padx=5)
 
-        self.include_height = tk.BooleanVar(value=False)
+        self.include_altitude = tk.BooleanVar(value=False)
 
         # Frame para o checkbox de incluir altura
         height_checkbox_frame = ttk.Frame(main_frame)
@@ -104,7 +104,7 @@ class FileToMemorialTab:
         self.height_checkbox = ttk.Checkbutton(
             height_checkbox_frame,
             text="Incluir Altura",
-            variable=self.include_height,
+            variable=self.include_altitude,
         )
         self.height_checkbox.pack(side=tk.LEFT, padx=5)
 
@@ -128,17 +128,20 @@ class FileToMemorialTab:
         self.result_area = tk.Text(
             text_frame, height=10, font=("TkDefaultFont", 12, "normal")
         )
-        self.result_area.pack(fill=tk.X, expand=False)
+        self.result_area.pack(fill=tk.BOTH, expand=True)
 
         # Botão para copiar o texto
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.BOTH, expand=True)  # Consider expanding if needed
         self.copy_button = ttk.Button(
-            text_frame,
+            button_frame,
             text="Copiar Memorial",
             command=self.copy_text,
             state=tk.DISABLED,
         )
         self.copy_button.pack(
-            expand=False,
+            side=tk.BOTTOM,  # or another side like tk.TOP, tk.LEFT, or tk.RIGHT
+            pady=4,  # Adds some padding for visibility
         )
 
     def copy_text(self):
@@ -172,6 +175,49 @@ class FileToMemorialTab:
         if not self.coordinates:
             return
 
+        # Obtém o EPSG atualizado
+        epsg_value = self.epsg_entry.get().strip()
+        if not epsg_value:
+            messagebox.showerror("Erro", "EPSG é um campo obrigatório!")
+            return
+
+        # Converte EPSG para inteiro
+        try:
+            epsg_code = int(epsg_value)
+        except ValueError:
+            messagebox.showerror("Erro", "EPSG inválido!")
+            return
+
+        # Limpa a área de texto
+        self.result_area.delete(1.0, tk.END)
+
+        # Converte as coordenadas para o formato selecionado
+        if self.coord_type.get() == "latlon":
+            display_coords = utm_to_latlon(self.coordinates, epsg_code)
+        else:
+            display_coords = latlon_to_utm(self.coordinates, epsg_code)
+
+        # Exibe as coordenadas no formato selecionado
+        self.result_area.insert(
+            tk.END,
+            boilerplate_switch(
+                self.memorial_type.get(),
+                display_coords,
+                epsg_code,
+                self.include_altitude.get(),  # Atualiza com a checkbox de altitude
+                self.vertex_entry.get(),
+            ),
+        )
+        self.result_area.insert(tk.END, "\n")
+        self.result_area.configure(padx=8, pady=8)
+
+        # Habilita o botão de copiar quando houver texto para copiar
+        self.copy_button.config(state=tk.NORMAL)
+
+        # Verifica se existem coordenadas para exibir
+        if not self.coordinates:
+            return
+
         # Limpa a área de texto
         self.result_area.delete(1.0, tk.END)
 
@@ -188,7 +234,7 @@ class FileToMemorialTab:
                 self.memorial_type.get(),
                 display_coords,
                 epsg,
-                self.include_height.get(),
+                self.include_altitude.get(),
                 self.vertex_entry.get(),
             ),
         )

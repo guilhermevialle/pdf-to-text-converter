@@ -1,6 +1,7 @@
 from utils.parsers.kml_parser import kml_parser
 from utils.parsers.shp_parser import shp_parser
 from utils.parsers.dxf_parser import dxf_parser
+from datetime import datetime
 
 
 def get_parser(file_type):
@@ -20,3 +21,8 @@ def get_epsg_info(epsg: int) -> tuple[float, str]:
     hemisferio = "W" if meridiano_central < 0 else "E"
 
     return abs(meridiano_central), hemisferio
+
+
+def get_date():
+    date = datetime.now().strftime("%d/%m/%Y")
+    return date

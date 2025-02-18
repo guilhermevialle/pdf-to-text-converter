@@ -1,28 +1,23 @@
 from utils.math.index import calculate_area, calculate_perimeter
 from utils.indetifiers.index import coordinates_system_identifier
-from datetime import datetime
-from utils.helpers.index import get_epsg_info
+from utils.helpers.index import get_epsg_info, get_date
 from constants.reference import epsg
+
 import re
 from utils.math.index import get_azimutes, get_distances
-
-
-def text_info():
-    date = datetime.now().strftime("%d/%m/%Y")
-    return date
 
 
 def sigef_memorial_boilerplate(
     coordinates,
     epsg: int,
-    include_height: bool,
+    include_altitude: bool,
     vertex_id: str = None,
 ):
     area = calculate_area(coordinates, "ha")
     perimeter = calculate_perimeter(coordinates, "m")
     meridiano, hemisferio = get_epsg_info(epsg)
 
-    utm_header = f"""
+    utm_header_text = f"""
 Imóvel:
 Matrícula do Imóvel:
 Cartório (CNS):
@@ -45,12 +40,12 @@ Azimutes: Azimutes Geodésicos
                                          IMÓVEL DESCRIÇÃO
 """
 
-    text_ends = f"""
+    footer_text = f"""
 Todas as coordenadas aqui descritas estão georreferenciadas ao Sistema Geodésico Brasileiro e encontram-se representadas no Sistema UTM, referenciadas ao Meridiano Central nº {meridiano} {hemisferio}Gr, tendo como Datum o SIRGAS2000. Todos os azimutes e distâncias, área e perímetro foram calculados no plano de projeção UTM.
 """
 
     date_text = f"""
-                                         Cidade, {text_info()}
+                                         Cidade, {get_date()}
 """
 
     footer_text = f"""
@@ -65,27 +60,28 @@ Código Credenciamento ASR -
 CREA:
 """
 
-    # Chama a função boilerplate e concatena com utm_header
-
-    description_text = boilerplate(coordinates, epsg, include_height, vertex_id)
-    full_text = (
-        utm_header
+    # Chama a função boilerplate e concatena com utm_header_text
+    description_text = coordinates_text_boilerplate(
+        coordinates, epsg, include_altitude, vertex_id
+    )
+    full_document_text = (
+        utm_header_text
         + "\n"
         + description_text
         + "\n"
-        + text_ends
+        + footer_text
         + "\n"
         + date_text
         + "\n"
         + footer_text
     )
-    return full_text
+    return full_document_text
 
 
-def boilerplate(
+def coordinates_text_boilerplate(
     coordinates,
     epsg: int,
-    include_height: bool,
+    include_altitude: bool,
     vertex_id: str = None,
 ):
     text = "Inicia-se a descrição deste perímetro no vértice "
@@ -111,8 +107,8 @@ def boilerplate(
         # Construindo o texto para as coordenadas
         coord_text = ""
         if coord_system == "utm":
-            coord_text = f"de coordenadas N {coord['y']:.2f}m e E {coord['x']:.2f}m"
-            if include_height and "alt" in coord:
+            coord_text = f"de coordenadas E {coord['y']:.2f}m e N {coord['x']:.2f}m"
+            if include_altitude and "alt" in coord:
                 coord_text += f" de altitude {coord['alt']:.2f}m"
 
         # Primeiro vértice
